@@ -116,6 +116,10 @@ class DropzoneDialog extends React.Component {
                             showFileNamesInPreview={this.props.showFileNamesInPreview}
                             useChipsForPreview={this.props.useChipsForPreview}
                             previewChipProps={this.props.previewChipProps}
+                            getFileLimitExceedMessage={this.props.getFileLimitExceedMessage}
+                            getFileAddedMessage={this.props.getFileAddedMessage}
+                            getFileRemovedMessage={this.props.getFileRemovedMessage}
+                            getDropRejectMessage={this.props.getDropRejectMessage}
                         />
                     </DialogContent>
                     <DialogActions>
@@ -160,6 +164,19 @@ DropzoneDialog.defaultProps = {
     onChange: () => { },
     onDrop: () => { },
     onDropRejected: () => { },
+    getFileLimitExceedMessage: (filesLimit) => (`Maximum allowed number of files exceeded. Only ${filesLimit} allowed`),
+    getFileAddedMessage: (fileName) => (`File ${fileName} successfully added.`),
+    getFileRemovedMessage: (fileName) => (`File ${fileName} removed.`),
+    getDropRejectMessage: (rejectedFile, acceptedFiles, maxFileSize) => {
+        let message = `File ${rejectedFile.name} was rejected. `;
+        if (!acceptedFiles.includes(rejectedFile.type)) {
+            message += 'File type not supported. '
+        }
+        if (rejectedFile.size > maxFileSize) {
+            message += 'File is too big. Size limit is ' + convertBytesToMbsOrKbs(maxFileSize) + '. ';
+        }
+        return message;
+    },
     logEvents: false
 };
 
@@ -186,7 +203,11 @@ DropzoneDialog.propTypes = {
     cancelButtonText: PropTypes.string,
     maxWidth: PropTypes.string,
     fullWidth: PropTypes.bool,
-    logEvents: PropTypes.bool
+    logEvents: PropTypes.bool,
+    getFileLimitExceedMessage: PropTypes.func,
+    getFileAddedMessage: PropTypes.func,
+    getFileRemovedMessage: PropTypes.func,
+    getDropRejectMessage: PropTypes.func,
 };
 
 export default DropzoneDialog;
